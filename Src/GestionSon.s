@@ -1,12 +1,14 @@
 	PRESERVE8
 	THUMB   
 		
+	include DriverJeuLaser.inc
+		
 	import LongueurSon
 	import Son
-	import PWM_Set_Value_TIM3_Ch3
 	
 	export CallbackSon
 	export SortieSon
+	export StartSon
 
 ; ====================== zone de réservation de données,  ======================================
 ;Section RAM (read only) :
@@ -51,8 +53,7 @@ CallbackSon proc
 	add r0, r3
 	ldr r3, =720
 	mul r0, r3
-	ldr r3, =65535
-	udiv r0, r3
+	lsr r0, #16
 	
 	;stocker la valeur convertie
 	ldr r3, =SortieSon
@@ -66,6 +67,16 @@ CallbackSon proc
 	bl PWM_Set_Value_TIM3_Ch3
 Fin
 	pop {pc}
+	endp
+		
+StartSon proc
+	;r0 = Index_pointer
+	ldr r0, =Index
+	;r1 = 0
+	mov r1, #0
+	;Mise à 0 de l'index
+	str r1, [r0]
+	bx lr
 	endp
 	
 	END	
