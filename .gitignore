@@ -1,0 +1,7 @@
+*/*/
+!.gitignore
+Pjt*/*
+!*/Driver/
+!*/Src/
+!*/*.uvoptx
+!*/*.uvprojx

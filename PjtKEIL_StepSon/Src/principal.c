@@ -1,9 +1,9 @@
 
 
 #include "DriverJeuLaser.h"
+#include "GestionSon.h"
 
 extern int PeriodeSonMicroSec;
-void CallbackSon(void);
 
 int main(void)
 {
@@ -26,6 +26,10 @@ GPIO_Configure(GPIOB, 0, OUTPUT, ALT_PPULL);
 	
 while	(1)
 	{
+		for(int i=0; i < 10000000; i++) {
+			
+		}
+		StartSon();
 	}
 }
 
