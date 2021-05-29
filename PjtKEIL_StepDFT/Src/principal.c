@@ -1,12 +1,14 @@
 
 
 #include "DriverJeuLaser.h"
+#include "GestionDFT.h"
 
-int DFT_ModuleAuCarre( short int * Signal64ech, char k);
+extern short int LeSignal;
+int Resu[64];
 
 int main(void)
 {
-
+int i;
 // ===========================================================================
 // ============= INIT PERIPH (faites qu'une seule fois)  =====================
 // ===========================================================================
@@ -15,7 +17,7 @@ int main(void)
 CLOCK_Configure();
 
 
-DFT_ModuleAuCarre(LeSignal, 0);	
+
 	
 
 //============================================================================	
@@ -23,6 +25,10 @@ DFT_ModuleAuCarre(LeSignal, 0);
 	
 while	(1)
 	{
+		for (i=0;i<64;i++)
+		{
+			Resu[i]= DFT_ModuleAuCarre(&LeSignal, i);
+		}
 	}
 }
 

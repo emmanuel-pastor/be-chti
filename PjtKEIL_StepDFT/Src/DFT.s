@@ -1,6 +1,7 @@
 	PRESERVE8
 	THUMB   
 		
+	export DFT_ModuleAuCarre
 
 ; ====================== zone de réservation de données,  ======================================
 ;Section RAM (read only) :
@@ -22,19 +23,71 @@
 ; écrire le code ici		
 
 DFT_ModuleAuCarre proc
-	;r1 = Signal_pointer
-	;r2 = k
-	;r3 = compteur
-	mov r3, #0
+	push {lr}
+	;Paramètres
+	;r0 = Signal_pointer
+	;r1 = k
+	
+	;r2 = n #compteur de boucle
+	mov r2, #0
+	;r4 = X_reel
+	push {r4}
+	mov r4, #0
+	;r5 = X_img
+	push {r5}
+	mov r5, #0
 	
 DebutBoucle
-	cmp r3, #63
-	beq Fin
+
+	;while (n != 64)
+	cmp r2, #64
+	beq FinBoucle
 	
-	add r3, #1
+	;r3 = (k*n) % 64 #compteur_cos_sin
+	mul r3, r1, r2
+	and r3, #63
+	
+	push {r6}
+	push {r7}
+	;x(n) * cos(2*PI*k*n/M)
+	;Signal[n] * TabCos[compteur_cos_sin]
+	;r6 = Signal[n]
+	ldrsh r6, [r0, r2, LSL #1]
+	;r7 = TabCos[compteur_cos_sin]
+	ldr r7, =TabCos
+	ldrsh r7, [r7, r3, LSL #1]
+	;Multiplication des deux
+	mul r6, r6, r7
+	;X_reel += Signal[n] * TabCos[compteur_cos_sin]
+	add r4, r6
+	
+	;x(n) * sin(2*PI*k*n/M)
+	;Signal[n] * TabSin[comteur_cos_sin]
+	;r6 = Signal[n]
+	ldrsh r6, [r0, r2, LSL #1]
+	;r7 = TabSin[compteur_cos]
+	ldr r7, =TabSin
+	ldrsh r7, [r7, r3, LSL #1]
+	;Multiplication des deux
+	mul r6, r6, r7
+	;X_img += Signal[n] * TabSin[compteur_cos_sin]
+	add r5, r6
+	pop {r7}
+	pop {r6}
+	
+	;n++
+	add r2, #1
 	bl DebutBoucle
-Fin
-	bx lr
+FinBoucle
+	;r0 = X_reel**2 + X_img**2
+	;X_reel**2
+	smull r1, r0, r4, r4
+	;X_img**2 et somme des deux
+	smlal r1, r0, r5, r5
+	
+	pop {r5}
+	pop {r4}
+	pop {pc}
 	endp
 
 
@@ -177,4 +230,4 @@ TabSin
 
 		
 		
-	END	
+	END
